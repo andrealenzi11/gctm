@@ -5,7 +5,7 @@ from gensim.models import Word2Vec
 
 from src.topic_modeling import GenerativeCooperativeTopicModeling
 from tm_utils.business.topics_evaluation import get_topics_words_scores
-from tm_utils.business.topics_utils import get_eng_keyed_vectors
+from tm_utils.business.topics_utils import get_eng_keyed_vectors, save_scores_diz, save_html_topics_table
 from tm_utils.config.configuration import TWENTY_NEWS_GROUP, IMDB_REVIEWERS, REUTERS, MODELS_DIR, ENG_STOPWORDS
 from tm_utils.dao.dataset_dao import TwentyNewsgroupsDao, ImdbReviewsDao, ReutersNewswireDao
 
@@ -67,52 +67,75 @@ if __name__ == '__main__':
         print(f"\n\n #################### NUMBER OF TOPICS: {NUM_TOPICS} ####################")
 
         print("\n >>>>>>>>>>>>>>>>>>>> GCTM")
-        gctm_obj = GenerativeCooperativeTopicModeling(num_topics=NUM_TOPICS,
-                                                      max_num_words=50,
-                                                      max_df=0.60,
-                                                      min_df=0.0005,
-                                                      stopwords=ENG_STOPWORDS,
-                                                      ngram_range=(1, 1),
-                                                      lowercase=True,
-                                                      max_features=None,
-                                                      num_epoches=5,
-                                                      batch_size=64,
-                                                      gen_learning_rate=0.001,
-                                                      discr_learning_rate=0.005,
-                                                      random_seed_size=128,
-                                                      generator_hidden_dim=256,
-                                                      discriminator_hidden_dim=256,
-                                                      document_dim=None,
-                                                      embeddings=kv)
+        for model_name in ("GCTM-e", "GCTM-b"):
 
-        # ===== computation on corpus (dimensional reduction, clustering, summarization) ===== #
-        print("\n >>> fit...")
-        gctm_obj.fit(corpus=x_train_prep)
+            print(f"\n  ##### Model name: {model_name} ##### \n")
 
-        # ====== get the extracted clusters of words ===== #
-        print("\n >>>> get topics... \n")
-        topics_matrix = gctm_obj.get_topics_words()
-        [print("Topic", num_row + 1, ", size =", len(row), " | ", row)
-         for num_row, row in enumerate(topics_matrix)]
+            if model_name == "GCTM-e":
+                gctm_obj = GenerativeCooperativeTopicModeling(num_topics=NUM_TOPICS,
+                                                              max_num_words=50,
+                                                              max_df=0.60,
+                                                              min_df=0.0005,
+                                                              stopwords=ENG_STOPWORDS,
+                                                              ngram_range=(1, 1),
+                                                              lowercase=True,
+                                                              max_features=None,
+                                                              num_epoches=5,
+                                                              batch_size=64,
+                                                              gen_learning_rate=0.001,
+                                                              discr_learning_rate=0.005,
+                                                              random_seed_size=128,
+                                                              generator_hidden_dim=256,
+                                                              discriminator_hidden_dim=256,
+                                                              document_dim=None,
+                                                              embeddings=kv)
+            else:
+                gctm_obj = GenerativeCooperativeTopicModeling(num_topics=NUM_TOPICS,
+                                                              max_num_words=50,
+                                                              max_df=0.60,
+                                                              min_df=0.0005,
+                                                              stopwords=ENG_STOPWORDS,
+                                                              ngram_range=(1, 1),
+                                                              lowercase=True,
+                                                              max_features=None,
+                                                              num_epoches=5,
+                                                              batch_size=64,
+                                                              gen_learning_rate=0.001,
+                                                              discr_learning_rate=0.005,
+                                                              random_seed_size=128,
+                                                              generator_hidden_dim=256,
+                                                              discriminator_hidden_dim=256,
+                                                              document_dim=None,
+                                                              embeddings=None)
 
-        # ===== compute scores ===== #
-        print("\n >>> Compute scores...")
-        scores_diz = get_topics_words_scores(topics=topics_matrix,
-                                             kv=eng_keyed_vectors,
-                                             corpus=x_train_prep)
-        print(scores_diz)
+            # ===== computation on corpus (dimensional reduction, clustering, summarization) ===== #
+            print("\n >>> fit...")
+            gctm_obj.fit(corpus=x_train_prep)
 
-        # ===== save topics and scores on FS ===== #
-        # print("\n >>> Save topics and scores on FS...")
-        # save_scores_diz(scores_diz=scores_diz,
-        #                 name="GCTM-e",
-        #                 num_topics=NUM_TOPICS,
-        #                 dataset_name=INPUT_DATASET)
-        #
-        # save_html_topics_table(topics_matrix=topics_matrix,
-        #                        name="GCTM-e",
-        #                        num_topics=NUM_TOPICS,
-        #                        num_top_words=NUM_TOP_WORDS,
-        #                        dataset_name=INPUT_DATASET)
+            # ====== get the extracted clusters of words ===== #
+            print("\n >>>> get topics... \n")
+            topics_matrix = gctm_obj.get_topics_words()
+            [print("Topic", num_row + 1, ", size =", len(row), " | ", row)
+             for num_row, row in enumerate(topics_matrix)]
 
-        print("\n ### END OF ITERATION! ### \n\n")
+            # ===== compute scores ===== #
+            print("\n >>> Compute scores...")
+            scores_diz = get_topics_words_scores(topics=topics_matrix,
+                                                 kv=eng_keyed_vectors,
+                                                 corpus=x_train_prep)
+            print(scores_diz)
+
+            # ===== save topics and scores on FS ===== #
+            print("\n >>> Save topics and scores on FS...")
+            save_scores_diz(scores_diz=scores_diz,
+                            name=model_name,
+                            num_topics=NUM_TOPICS,
+                            dataset_name=INPUT_DATASET)
+
+            save_html_topics_table(topics_matrix=topics_matrix,
+                                   name=model_name,
+                                   num_topics=NUM_TOPICS,
+                                   num_top_words=NUM_TOP_WORDS,
+                                   dataset_name=INPUT_DATASET)
+
+            print("\n ### END OF ITERATION! ### \n\n")
