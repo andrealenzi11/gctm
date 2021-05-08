@@ -1,13 +1,13 @@
 import os
 
 import tensorflow as tf
-from business.topics_evaluation import get_topics_words_scores
-from business.topics_utils import get_eng_keyed_vectors
-from config.configuration import ENG_STOPWORDS, TWENTY_NEWS_GROUP, MODELS_DIR, IMDB_REVIEWERS, REUTERS
-from dao.dataset_dao import TwentyNewsgroupsDao, ImdbReviewsDao, ReutersNewswireDao
 from gensim.models import Word2Vec
-from gtcacs.topic_modeling2 import GTCACS
 
+from src.topic_modeling import GenerativeCooperativeTopicModeling
+from tm_utils.business.topics_evaluation import get_topics_words_scores
+from tm_utils.business.topics_utils import get_eng_keyed_vectors
+from tm_utils.config.configuration import TWENTY_NEWS_GROUP, IMDB_REVIEWERS, REUTERS, MODELS_DIR, ENG_STOPWORDS
+from tm_utils.dao.dataset_dao import TwentyNewsgroupsDao, ImdbReviewsDao, ReutersNewswireDao
 
 if __name__ == '__main__':
 
@@ -61,38 +61,37 @@ if __name__ == '__main__':
 
     # ===== Load trained embeddings model ===== #
     print("\n - Load trained word2vec model...")
-    # kv = api.load("glove-wiki-gigaword-100")
     kv = Word2Vec.load(os.path.join(MODELS_DIR, INPUT_DATASET, "word2vec_final.model")).wv
 
     for NUM_TOPICS in (10, 20, 30):
         print(f"\n\n #################### NUMBER OF TOPICS: {NUM_TOPICS} ####################")
 
-        print("\n >>>>>>>>>>>>>>>>>>>> GTCACS")
-        gtcacs_obj = GTCACS(num_topics=NUM_TOPICS,
-                            max_num_words=50,
-                            max_df=0.60,
-                            min_df=0.0005,
-                            stopwords=ENG_STOPWORDS,
-                            ngram_range=(1, 1),
-                            lowercase=True,
-                            max_features=None,
-                            num_epoches=5,
-                            batch_size=64,
-                            gen_learning_rate=0.001,
-                            discr_learning_rate=0.005,
-                            random_seed_size=128,
-                            generator_hidden_dim=256,
-                            discriminator_hidden_dim=256,
-                            document_dim=None,
-                            embeddings=kv)
+        print("\n >>>>>>>>>>>>>>>>>>>> GCTM")
+        gctm_obj = GenerativeCooperativeTopicModeling(num_topics=NUM_TOPICS,
+                                                      max_num_words=50,
+                                                      max_df=0.60,
+                                                      min_df=0.0005,
+                                                      stopwords=ENG_STOPWORDS,
+                                                      ngram_range=(1, 1),
+                                                      lowercase=True,
+                                                      max_features=None,
+                                                      num_epoches=5,
+                                                      batch_size=64,
+                                                      gen_learning_rate=0.001,
+                                                      discr_learning_rate=0.005,
+                                                      random_seed_size=128,
+                                                      generator_hidden_dim=256,
+                                                      discriminator_hidden_dim=256,
+                                                      document_dim=None,
+                                                      embeddings=kv)
 
         # ===== computation on corpus (dimensional reduction, clustering, summarization) ===== #
         print("\n >>> fit...")
-        gtcacs_obj.fit(corpus=x_train_prep)
+        gctm_obj.fit(corpus=x_train_prep)
 
         # ====== get the extracted clusters of words ===== #
         print("\n >>>> get topics... \n")
-        topics_matrix = gtcacs_obj.get_topics_words()
+        topics_matrix = gctm_obj.get_topics_words()
         [print("Topic", num_row + 1, ", size =", len(row), " | ", row)
          for num_row, row in enumerate(topics_matrix)]
 
@@ -106,12 +105,12 @@ if __name__ == '__main__':
         # ===== save topics and scores on FS ===== #
         # print("\n >>> Save topics and scores on FS...")
         # save_scores_diz(scores_diz=scores_diz,
-        #                 name="GTCACS",
+        #                 name="GCTM-e",
         #                 num_topics=NUM_TOPICS,
         #                 dataset_name=INPUT_DATASET)
         #
         # save_html_topics_table(topics_matrix=topics_matrix,
-        #                        name="GTCACS",
+        #                        name="GCTM-e",
         #                        num_topics=NUM_TOPICS,
         #                        num_top_words=NUM_TOP_WORDS,
         #                        dataset_name=INPUT_DATASET)

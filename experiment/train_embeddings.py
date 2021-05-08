@@ -1,20 +1,13 @@
-import logging
 import os
 
 import math
 
-from business.embeddings_training import train_word2vec_embeddings, try_embeddings_model
-from config.configuration import TWENTY_NEWS_GROUP, MODELS_DIR, IMDB_REVIEWERS, REUTERS
-from dao.dataset_dao import TwentyNewsgroupsDao, ImdbReviewsDao, ReutersNewswireDao
-from gtcacs.text_compression2 import GTC_NN_LOGGER_NAME
+from src.embeddings_training import train_word2vec_embeddings, try_embeddings_model
+from tm_utils.config.configuration import TWENTY_NEWS_GROUP, MODELS_DIR, IMDB_REVIEWERS, REUTERS
+from tm_utils.dao.dataset_dao import TwentyNewsgroupsDao, ImdbReviewsDao, ReutersNewswireDao
 
 
 if __name__ == '__main__':
-
-    logger_gtcacs = logging.getLogger(GTC_NN_LOGGER_NAME)
-    logger_gtcacs.setLevel(level=logging.INFO)
-    logger_poincare = logging.getLogger("gensim.models.poincare")
-    logger_poincare.setLevel(level=logging.INFO)
 
     INPUT_DATASET = TWENTY_NEWS_GROUP
 

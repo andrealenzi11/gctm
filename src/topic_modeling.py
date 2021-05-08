@@ -1,7 +1,7 @@
 import copy
-import math
 from typing import List, Tuple, Dict, Union, Set, Optional, Sequence
 
+import math
 import numpy as np
 from gensim.models import KeyedVectors
 from scipy.sparse import csr_matrix
@@ -11,13 +11,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
 
-from src.text_compression import GenerativeTextCompressionNN
+from src.text_compression import GenerativeCooperativeTextCompressionNN
 
 
-class GTCACS:
+class GenerativeCooperativeTopicModeling:
     """
-        Generative Text Compression with Agglomerative Clustering Summarization (GTCACS):
-        a NLP model for topic extraction, presented in the paper
+        Generative Cooperative Topic Modeling  (GCTM)
     """
 
     def __init__(
@@ -38,7 +37,6 @@ class GTCACS:
             generator_hidden_dim: int = 256,
             discriminator_hidden_dim: int = 256,
             document_dim: Optional[int] = None,
-            # latent_space_dim: int = 64,
             embeddings: Optional[KeyedVectors] = None,
     ):
         """
@@ -119,7 +117,6 @@ class GTCACS:
         self.discriminator_hidden_dim = discriminator_hidden_dim
         self.document_dim = document_dim
         self.latent_space_dim = self.num_topics
-        # self.latent_space_dim = latent_space_dim
 
         # Embeddings optimization Parameters
         self.embeddings = embeddings  # gensim keyed vectors
@@ -148,7 +145,7 @@ class GTCACS:
                 ("dense", FunctionTransformer(csr_matrix.todense))
             ]
         )
-        self.dim_red_model = GenerativeTextCompressionNN(
+        self.dim_red_model = GenerativeCooperativeTextCompressionNN(
             num_epoches=self.num_epoches,
             batch_size=self.batch_size,
             gen_learning_rate=self.gen_learning_rate,
