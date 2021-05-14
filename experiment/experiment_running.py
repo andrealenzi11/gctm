@@ -14,9 +14,9 @@ if __name__ == '__main__':
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     print(tf.__version__)
 
-    # ===== Set the input dataset, the number of topics and the number of words for cluster ===== #
     print("\n\n >>> Settings")
 
+    # ===== Set the input dataset, the number of topics and the number of words for cluster ===== #
     INPUT_DATASET = TWENTY_NEWS_GROUP
     print(f"\t\t input_dataset:  {INPUT_DATASET}")
     print("\n")
@@ -39,13 +39,6 @@ if __name__ == '__main__':
             ReutersNewswireDao().load_preprocessed()
     else:
         raise ValueError(f"Invalid input dataset '{INPUT_DATASET}'!")
-
-    # sample = False
-    # if sample:
-    #     x_train, x_test, x_train_prep, x_test_prep, y_train_prep, y_test_prep = \
-    #         x_train[:1000], x_test[:1000], \
-    #         x_train_prep[:1000], x_test_prep[:1000], \
-    #         y_train_prep[:1000], y_test_prep[:1000]
 
     print(f"\n\n >>> Input dataset '{INPUT_DATASET}' info:")
     print("\t\t x_train size: ", len(x_train))

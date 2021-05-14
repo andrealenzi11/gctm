@@ -59,41 +59,41 @@ class GenerativeCooperativeTopicModeling:
             stopwords : (*Set[str]*)
                 stopwords set
 
-            ngram_range: (**)
+            ngram_range: (*Tuple[int, int]*)
                 range for ngram
 
-            lowercase: (**)
+            lowercase: (*bool*)
                 flag for convert to lowercase
 
-            max_features: (**)
+            max_features: (*int*)
                 maximum number of terms to consider (max vocabulary size)
 
-            num_epoches: (**)
+            num_epoches: (*int*)
                 number of epochs
 
-            batch_size: (**)
+            batch_size: (*int*)
                 number of documents in a batch
 
-            gen_learning_rate: (**)
+            gen_learning_rate: (*float*)
                 learning rate for optimize the generative part
 
-            discr_learning_rate: (**)
+            discr_learning_rate: (*float*)
                 learning rate for optimize the discriminative part
 
-            random_seed_size: (**)
+            random_seed_size: (*Optional[None]*)
                 dimension of generator input layer
 
-            generator_hidden_dim: (**)
+            generator_hidden_dim: (*int*)
                 dimension of generator hidden layer
 
-            document_dim: (**)
+            discriminator_hidden_dim: (*int*)
+                dimension of discriminator hidden layer
+
+            document_dim: (*Optional[int]*)
                 dimension of generator output layer and discriminator's input/output layer
 
-            #latent_space_dim: (**)
-                dimension of discriminator latent space
-
-            discriminator_hidden_dim: (**)
-                dimension of discriminator hidden layer
+            embeddings: (*Optional[KeyedVectors]*)
+                keyed embeddings vector (not specify them, if you don't want to activate the embeddings optimization)
         """
 
         self.num_topics = num_topics

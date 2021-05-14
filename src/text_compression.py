@@ -40,8 +40,7 @@ class Generator(tf.keras.Model):
             activation=tf.nn.relu,
             kernel_regularizer=regularization_norm,
             activity_regularizer=regularization_norm,
-            # kernel_constraint=MinMaxNorm(min_value=min_value,
-            #                              max_value=max_value)
+            # kernel_constraint=MinMaxNorm(min_value=min_value, max_value=max_value)
         )
         self.hidden1_dropout = tf.keras.layers.Dropout(rate=0.3)
         self.output_layer = tf.keras.layers.Dense(
